@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>نظام الحسابات — شركة المقاولات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2e3347;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --green: #2ecc8a;
+    --red: #e05c5c;
+    --yellow: #f0b429;
+    --text: #e8eaf0;
+    --muted: #7a7f9a;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Tajawal', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    direction: rtl;
+  }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1a1d27 0%, #12151f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--text); }
+  .header-title span { color: var(--accent); }
+  .header-actions { display: flex; gap: 8px; }
+
+  /* LAYOUT */
+  .layout { display: flex; min-height: calc(100vh - 57px); }
+  .sidebar {
+    width: 220px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    padding: 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .main { flex: 1; padding: 24px; overflow-y: auto; }
+
+  /* SIDEBAR ITEMS */
+  .sidebar-label {
+    font-size: 10px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 8px 4px;
+    margin-top: 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--muted);
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: right;
+    font-family: 'Tajawal', sans-serif;
+  }
+  .sidebar-item:hover { background: var(--surface2); color: var(--text); }
+  .sidebar-item.active { background: rgba(79,142,247,0.12); color: var(--accent); font-weight: 600; }
+  .sidebar-item .icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* PROJECT LIST */
+  .project-list { margin-top: 4px; }
+  .project-tag {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: all 0.15s;
+  }
+  .project-tag:hover { background: var(--surface2); color: var(--text); }
+  .project-tag.active { background: rgba(124,92,252,0.12); color: var(--accent2); font-weight: 600; }
+  .project-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent2); }
+
+  /* CARDS */
+  .cards-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 3px; height: 100%;
+  }
+  .card.green::before { background: var(--green); }
+  .card.red::before { background: var(--red); }
+  .card.blue::before { background: var(--accent); }
+  .card.purple::before { background: var(--accent2); }
+  .card-label { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .card-value { font-size: 22px; font-weight: 800; }
+  .card.green .card-value { color: var(--green); }
+  .card.red .card-value { color: var(--red); }
+  .card.blue .card-value { color: var(--accent); }
+  .card.purple .card-value { color: var(--accent2); }
+  .card-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+  /* SECTION */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #3a7de8; }
+  .btn-success { background: var(--green); color: #fff; }
+  .btn-success:hover { background: #25b578; }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-danger:hover { background: #c94f4f; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* TABLE */
+  .table-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--surface2);
+    padding: 11px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    text-align: right;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 11px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(46,51,71,0.5);
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .badge-green { background: rgba(46,204,138,0.12); color: var(--green); }
+  .badge-red { background: rgba(224,92,92,0.12); color: var(--red); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    width: 440px;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+  input, select, textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border 0.15s;
+    direction: rtl;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+  select option { background: var(--surface2); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 4px; background: var(--surface2); padding: 4px; border-radius: 10px; width: fit-content; margin-bottom: 20px; }
+  .tab {
+    padding: 7px 16px;
+    border-radius: 7px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    transition: all 0.15s;
+  }
+  .tab.active { background: var(--surface); color: var(--text); font-weight: 700; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 48px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* REPORT */
+  .report-filters {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .report-filters .form-group { margin: 0; flex: 1; min-width: 140px; }
+
+  /* PRINT */
+  @media print {
+    .sidebar, .header-actions, .btn, .tabs { display: none !important; }
+    .layout { display: block; }
+    .main { padding: 0; }
+    body { background: #fff; color: #000; }
+    .card, .table-wrap { border: 1px solid #ddd; }
+    .card-value { color: #000 !important; }
+  }
+
+  @media (max-width: 680px) {
+    .sidebar { display: none; }
+    .cards-row { grid-template-columns: 1fr 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .main { padding: 16px; }
+  }
+
+  .amount-in { color: var(--green); font-weight: 700; }
+  .amount-out { color: var(--red); font-weight: 700; }
+
+  .actions-cell { display: flex; gap: 6px; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .project-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .project-header h2 { font-size: 20px; font-weight: 800; }
+
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .summary-row:last-child { border: none; font-weight: 700; font-size: 15px; }
+
+  .no-data { color: var(--muted); font-size: 13px; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">💼 <span>حسابات</span> المقاولات</div>
+  <div class="header-actions">
+    <button class="btn btn-ghost btn-sm" onclick="exportData()">⬇ تصدير</button>
+    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('importFile').click()">⬆ استيراد</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 طباعة</button>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="sidebar-item active" onclick="showPage('dashboard', this)">
+      <span class="icon">📊</span> الرئيسية
+    </button>
+    <button class="sidebar-item" onclick="showPage('transactions', this)">
+      <span class="icon">📋</span> كل الحركات
+    </button>
+    <button class="sidebar-item" onclick="showPage('reports', this)">
+      <span class="icon">📈</span> التقارير
+    </button>
+
+    <div class="sidebar-label">المشاريع</div>
+    <div class="project-list" id="sidebarProjects"></div>
+    <button class="sidebar-item" onclick="openAddProject()" style="margin-top:4px">
+      <span class="icon">＋</span> مشروع جديد
+    </button>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="cards-row" id="dashCards"></div>
+
+      <div class="section-header">
+        <div class="section-title">آخر الحركات</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-success btn-sm" onclick="openTx('in')">+ قبض</button>
+          <button class="btn btn-danger btn-sm" onclick="openTx('out')">− صرف</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>المشروع</th>
+              <th>النوع / التصنيف</th>
+              <th>الملاحظة</th>
+              <th>المبلغ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="recentTxBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALL TRANSACTIONS -->
+    <div class="page" id="page-transactions">
+      <div class="section-header">
+        <div class="section-title">جميع الحركات</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-success btn-sm" onclick="openTx('in')">+ قبض</button>
+          <button class="btn btn-danger btn-sm" onclick="openTx('out')">− صرف</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <select id="filterProject" style="width:160px" onchange="renderAllTx()">
+          <option value="">كل المشاريع</option>
+        </select>
+        <select id="filterType" style="width:130px" onchange="renderAllTx()">
+          <option value="">قبض وصرف</option>
+          <option value="in">قبض فقط</option>
+          <option value="out">صرف فقط</option>
+        </select>
+        <input type="date" id="filterFrom" style="width:145px" onchange="renderAllTx()">
+        <input type="date" id="filterTo" style="width:145px" onchange="renderAllTx()">
+        <button class="btn btn-ghost btn-sm" onclick="clearFilters()">مسح الفلتر</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>المشروع</th>
+              <th>النوع / التصنيف</th>
+              <th>الملاحظة</th>
+              <th>المبلغ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="allTxBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PROJECT PAGE -->
+    <div class="page" id="page-project">
+      <div class="project-header">
+        <div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:4px">المشروع</div>
+          <h2 id="projectPageTitle"></h2>
+        </div>
+        <div style="margin-right:auto;display:flex;gap:8px">
+          <button class="btn btn-success btn-sm" onclick="openTx('in')">+ قبض</button>
+          <button class="btn btn-danger btn-sm" onclick="openTx('out')">− صرف</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteProject()">🗑 حذف المشروع</button>
+        </div>
+      </div>
+      <div class="cards-row" id="projectCards"></div>
+      <div class="section-header" style="margin-top:8px">
+        <div class="section-title">حركات المشروع</div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>التاريخ</th>
+              <th>النوع / التصنيف</th>
+              <th>الملاحظة</th>
+              <th>المبلغ</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="projectTxBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div class="page" id="page-reports">
+      <div class="section-title" style="margin-bottom:16px">التقارير</div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchReport('weekly', this)">أسبوعي</button>
+        <button class="tab" onclick="switchReport('monthly', this)">شهري</button>
+        <button class="tab" onclick="switchReport('custom', this)">مخصص</button>
+      </div>
+
+      <div class="report-filters" id="reportFilters">
+        <div class="form-group" id="rfWeekWrap">
+          <label>الأسبوع</label>
+          <input type="week" id="rfWeek" onchange="renderReport()">
+        </div>
+        <div class="form-group" id="rfMonthWrap" style="display:none">
+          <label>الشهر</label>
+          <input type="month" id="rfMonth" onchange="renderReport()">
+        </div>
+        <div class="form-group" id="rfFromWrap" style="display:none">
+          <label>من</label>
+          <input type="date" id="rfFrom" onchange="renderReport()">
+        </div>
+        <div class="form-group" id="rfToWrap" style="display:none">
+          <label>إلى</label>
+          <input type="date" id="rfTo" onchange="renderReport()">
+        </div>
+        <div class="form-group">
+          <label>المشروع</label>
+          <select id="rfProject" onchange="renderReport()">
+            <option value="">كل المشاريع</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="window.print()" style="align-self:flex-end">🖨 طباعة</button>
+      </div>
+
+      <div id="reportContent"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: ADD TRANSACTION -->
+<div class="modal-overlay" id="txModal">
+  <div class="modal">
+    <div class="modal-title" id="txModalTitle">إضافة قبض</div>
+    <div class="form-group">
+      <label>المشروع</label>
+      <select id="txProject"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>التاريخ</label>
+        <input type="date" id="txDate">
+      </div>
+      <div class="form-group">
+        <label>المبلغ (د.ع)</label>
+        <input type="number" id="txAmount" placeholder="0">
+      </div>
+    </div>
+    <div class="form-group">
+      <label id="txCatLabel">المصدر</label>
+      <select id="txCategory"></select>
+    </div>
+    <div class="form-group">
+      <label>ملاحظة</label>
+      <input type="text" id="txNote" placeholder="اختياري">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeTxModal()">إلغاء</button>
+      <button class="btn btn-primary" id="txSaveBtn" onclick="saveTx()">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD PROJECT -->
+<div class="modal-overlay" id="projectModal">
+  <div class="modal">
+    <div class="modal-title">مشروع جديد</div>
+    <div class="form-group">
+      <label>اسم المشروع</label>
+      <input type="text" id="projectName" placeholder="مثال: مشروع المنصور">
+    </div>
+    <div class="form-group">
+      <label>الموقع (اختياري)</label>
+      <input type="text" id="projectLocation" placeholder="مثال: بغداد - الكرخ">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeProjectModal()">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveProject()">إضافة</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const IN_CATS = ['سلفة من الشركة المتعاقدة', 'إيداع من المالك', 'أخرى'];
+const OUT_CATS = ['رواتب موظفين', 'مواد بناء', 'معدات وأدوات', 'مقاولين فرعيين', 'مصاريف إدارية', 'نثريات'];
+
+let db = {
+  projects: [],
+  transactions: []
+};
+
+function loadDB() {
+  try {
+    const saved = localStorage.getItem('aqar_hesabat_v1');
+    if (saved) db = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function saveDB() {
+  localStorage.setItem('aqar_hesabat_v1', JSON.stringify(db));
+}
+
+loadDB();
+
+// ===================== UTILS =====================
+function fmt(n) {
+  return Number(n).toLocaleString('ar-IQ') + ' د.ع';
+}
+function today() {
+  return new Date().toISOString().split('T')[0];
+}
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+function getProjectName(id) {
+  const p = db.projects.find(p => p.id === id);
+  return p ? p.name : '—';
+}
+
+// ===================== NAVIGATION =====================
+let currentPage = 'dashboard';
+let currentProjectId = null;
+
+function showPage(page, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.project-tag').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  currentPage = page;
+
+  if (page === 'dashboard') renderDashboard();
+  if (page === 'transactions') renderAllTx();
+  if (page === 'reports') initReports();
+}
+
+function showProjectPage(projectId) {
+  currentProjectId = projectId;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-project').classList.add('active');
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.project-tag').forEach(b => b.classList.remove('active'));
+  const tag = document.querySelector(`.project-tag[data-id="${projectId}"]`);
+  if (tag) tag.classList.add('active');
+  currentPage = 'project';
+  renderProjectPage();
+}
+
+// ===================== SIDEBAR =====================
+function renderSidebar() {
+  const wrap = document.getElementById('sidebarProjects');
+  wrap.innerHTML = '';
+  db.projects.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'project-tag';
+    div.dataset.id = p.id;
+    div.innerHTML = `<span>● ${p.name}</span>`;
+    div.onclick = () => showProjectPage(p.id);
+    wrap.appendChild(div);
+  });
+
+  // populate project selects
+  ['filterProject', 'rfProject'].forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    const val = sel.value;
+    sel.innerHTML = '<option value="">كل المشاريع</option>';
+    db.projects.forEach(p => {
+      sel.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+    });
+    sel.value = val;
+  });
+}
+
+// ===================== DASHBOARD =====================
+function renderDashboard() {
+  // cards
+  const txAll = db.transactions;
+  const totalIn = txAll.filter(t => t.type === 'in').reduce((s, t) => s + t.amount, 0);
+  const totalOut = txAll.filter(t => t.type === 'out').reduce((s, t) => s + t.amount, 0);
+  const balance = totalIn - totalOut;
+
+  document.getElementById('dashCards').innerHTML = `
+    <div class="card blue">
+      <div class="card-label">الرصيد الإجمالي</div>
+      <div class="card-value">${fmt(balance)}</div>
+      <div class="card-sub">${db.projects.length} مشروع نشط</div>
+    </div>
+    <div class="card green">
+      <div class="card-label">إجمالي القبض</div>
+      <div class="card-value">${fmt(totalIn)}</div>
+    </div>
+    <div class="card red">
+      <div class="card-label">إجمالي الصرف</div>
+      <div class="card-value">${fmt(totalOut)}</div>
+    </div>
+    <div class="card purple">
+      <div class="card-label">عدد الحركات</div>
+      <div class="card-value">${txAll.length}</div>
+    </div>
+  `;
+
+  // recent
+  const recent = [...db.transactions].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 15);
+  renderTxTable('recentTxBody', recent, true);
+}
+
+// ===================== TRANSACTIONS TABLE =====================
+function renderTxTable(tbodyId, txs, showProject) {
+  const tbody = document.getElementById(tbodyId);
+  if (!txs.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="no-data">لا توجد حركات</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = txs.map(t => `
+    <tr>
+      <td>${t.date}</td>
+      ${showProject ? `<td>${getProjectName(t.projectId)}</td>` : ''}
+      <td>
+        <span class="badge ${t.type === 'in' ? 'badge-green' : 'badge-red'}">
+          ${t.type === 'in' ? '↑ قبض' : '↓ صرف'}
+        </span>
+        <span style="margin-right:6px;font-size:12px;color:var(--muted)">${t.category}</span>
+      </td>
+      <td style="color:var(--muted);font-size:13px">${t.note || '—'}</td>
+      <td class="${t.type === 'in' ? 'amount-in' : 'amount-out'}">${fmt(t.amount)}</td>
+      <td>
+        <div class="actions-cell">
+          <button class="btn btn-ghost btn-sm" onclick="editTx('${t.id}')">✏</button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteTx('${t.id}')">🗑</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ===================== ALL TRANSACTIONS =====================
+function renderAllTx() {
+  const proj = document.getElementById('filterProject').value;
+  const type = document.getElementById('filterType').value;
+  const from = document.getElementById('filterFrom').value;
+  const to = document.getElementById('filterTo').value;
+
+  let txs = [...db.transactions];
+  if (proj) txs = txs.filter(t => t.projectId === proj);
+  if (type) txs = txs.filter(t => t.type === type);
+  if (from) txs = txs.filter(t => t.date >= from);
+  if (to) txs = txs.filter(t => t.date <= to);
+  txs.sort((a, b) => b.date.localeCompare(a.date));
+  renderTxTable('allTxBody', txs, true);
+}
+
+function clearFilters() {
+  ['filterProject','filterType','filterFrom','filterTo'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  renderAllTx();
+}
+
+// ===================== PROJECT PAGE =====================
+function renderProjectPage() {
+  const p = db.projects.find(p => p.id === currentProjectId);
+  if (!p) return;
+  document.getElementById('projectPageTitle').textContent = p.name + (p.location ? ' — ' + p.location : '');
+
+  const txs = db.transactions.filter(t => t.projectId === currentProjectId);
+  const totalIn = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.amount, 0);
+  const totalOut = txs.filter(t => t.type === 'out').reduce((s, t) => s + t.amount, 0);
+  const balance = totalIn - totalOut;
+
+  document.getElementById('projectCards').innerHTML = `
+    <div class="card blue">
+      <div class="card-label">رصيد المشروع</div>
+      <div class="card-value">${fmt(balance)}</div>
+    </div>
+    <div class="card green">
+      <div class="card-label">إجمالي القبض</div>
+      <div class="card-value">${fmt(totalIn)}</div>
+    </div>
+    <div class="card red">
+      <div class="card-label">إجمالي الصرف</div>
+      <div class="card-value">${fmt(totalOut)}</div>
+    </div>
+    <div class="card purple">
+      <div class="card-label">عدد الحركات</div>
+      <div class="card-value">${txs.length}</div>
+    </div>
+  `;
+
+  const sorted = [...txs].sort((a, b) => b.date.localeCompare(a.date));
+  renderTxTable('projectTxBody', sorted, false);
+}
+
+// ===================== TRANSACTION MODAL =====================
+let txMode = 'add'; // add | edit
+let editTxId = null;
+let txType = 'in';
+
+function openTx(type) {
+  txMode = 'add';
+  editTxId = null;
+  txType = type;
+  document.getElementById('txModalTitle').textContent = type === 'in' ? 'إضافة قبض' : 'إضافة صرف';
+  document.getElementById('txSaveBtn').textContent = 'حفظ';
+  document.getElementById('txDate').value = today();
+  document.getElementById('txAmount').value = '';
+  document.getElementById('txNote').value = '';
+
+  // project
+  const sel = document.getElementById('txProject');
+  sel.innerHTML = db.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  if (currentProjectId && currentPage === 'project') sel.value = currentProjectId;
+
+  // category
+  document.getElementById('txCatLabel').textContent = type === 'in' ? 'المصدر' : 'التصنيف';
+  const cats = type === 'in' ? IN_CATS : OUT_CATS;
+  document.getElementById('txCategory').innerHTML = cats.map(c => `<option>${c}</option>`).join('');
+
+  if (!db.projects.length) {
+    alert('أضف مشروعاً أولاً قبل تسجيل الحركات');
+    return;
+  }
+  document.getElementById('txModal').classList.add('open');
+}
+
+function editTx(id) {
+  const t = db.transactions.find(t => t.id === id);
+  if (!t) return;
+  txMode = 'edit';
+  editTxId = id;
+  txType = t.type;
+
+  document.getElementById('txModalTitle').textContent = t.type === 'in' ? 'تعديل قبض' : 'تعديل صرف';
+  document.getElementById('txSaveBtn').textContent = 'تحديث';
+  document.getElementById('txDate').value = t.date;
+  document.getElementById('txAmount').value = t.amount;
+  document.getElementById('txNote').value = t.note || '';
+
+  const sel = document.getElementById('txProject');
+  sel.innerHTML = db.projects.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  sel.value = t.projectId;
+
+  document.getElementById('txCatLabel').textContent = t.type === 'in' ? 'المصدر' : 'التصنيف';
+  const cats = t.type === 'in' ? IN_CATS : OUT_CATS;
+  document.getElementById('txCategory').innerHTML = cats.map(c => `<option>${c}</option>`).join('');
+  document.getElementById('txCategory').value = t.category;
+
+  document.getElementById('txModal').classList.add('open');
+}
+
+function closeTxModal() {
+  document.getElementById('txModal').classList.remove('open');
+}
+
+function saveTx() {
+  const projectId = document.getElementById('txProject').value;
+  const date = document.getElementById('txDate').value;
+  const amount = parseFloat(document.getElementById('txAmount').value);
+  const category = document.getElementById('txCategory').value;
+  const note = document.getElementById('txNote').value.trim();
+
+  if (!projectId || !date || !amount || amount <= 0) {
+    alert('يرجى ملء جميع الحقول المطلوبة');
+    return;
+  }
+
+  if (txMode === 'edit') {
+    const t = db.transactions.find(t => t.id === editTxId);
+    Object.assign(t, { projectId, date, amount, category, note });
+  } else {
+    db.transactions.push({ id: uid(), type: txType, projectId, date, amount, category, note });
+  }
+
+  saveDB();
+  closeTxModal();
+  refresh();
+}
+
+function deleteTx(id) {
+  if (!confirm('حذف هذه الحركة؟')) return;
+  db.transactions = db.transactions.filter(t => t.id !== id);
+  saveDB();
+  refresh();
+}
+
+// ===================== PROJECT MODAL =====================
+function openAddProject() {
+  document.getElementById('projectName').value = '';
+  document.getElementById('projectLocation').value = '';
+  document.getElementById('projectModal').classList.add('open');
+}
+function closeProjectModal() {
+  document.getElementById('projectModal').classList.remove('open');
+}
+function saveProject() {
+  const name = document.getElementById('projectName').value.trim();
+  if (!name) { alert('أدخل اسم المشروع'); return; }
+  const location = document.getElementById('projectLocation').value.trim();
+  db.projects.push({ id: uid(), name, location });
+  saveDB();
+  closeProjectModal();
+  renderSidebar();
+}
+function deleteProject() {
+  if (!confirm('حذف المشروع وجميع حركاته؟')) return;
+  db.projects = db.projects.filter(p => p.id !== currentProjectId);
+  db.transactions = db.transactions.filter(t => t.projectId !== currentProjectId);
+  saveDB();
+  renderSidebar();
+  showPage('dashboard', document.querySelector('.sidebar-item'));
+}
+
+// ===================== REPORTS =====================
+let reportMode = 'weekly';
+
+function initReports() {
+  renderSidebar();
+  const now = new Date();
+  document.getElementById('rfWeek').value = now.toISOString().slice(0, 7).replace('-', '-W').slice(0, 8) + getWeekNumber(now).toString().padStart(2, '0');
+
+  // set current month
+  document.getElementById('rfMonth').value = now.toISOString().slice(0, 7);
+
+  // set custom range: this month
+  const y = now.getFullYear(), m = String(now.getMonth() + 1).padStart(2, '0');
+  document.getElementById('rfFrom').value = `${y}-${m}-01`;
+  document.getElementById('rfTo').value = today();
+
+  renderReport();
+}
+
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+function switchReport(mode, btn) {
+  reportMode = mode;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.getElementById('rfWeekWrap').style.display = mode === 'weekly' ? '' : 'none';
+  document.getElementById('rfMonthWrap').style.display = mode === 'monthly' ? '' : 'none';
+  document.getElementById('rfFromWrap').style.display = mode === 'custom' ? '' : 'none';
+  document.getElementById('rfToWrap').style.display = mode === 'custom' ? '' : 'none';
+
+  renderReport();
+}
+
+function getReportRange() {
+  if (reportMode === 'weekly') {
+    const val = document.getElementById('rfWeek').value;
+    if (!val) return null;
+    const [year, week] = val.split('-W');
+    const d = new Date(year, 0, 1 + (week - 1) * 7);
+    while (d.getDay() !== 1) d.setDate(d.getDate() - 1);
+    const from = d.toISOString().split('T')[0];
+    const to = new Date(d.getTime() + 6 * 86400000).toISOString().split('T')[0];
+    return { from, to };
+  }
+  if (reportMode === 'monthly') {
+    const val = document.getElementById('rfMonth').value;
+    if (!val) return null;
+    const [y, m] = val.split('-');
+    const from = `${y}-${m}-01`;
+    const last = new Date(y, m, 0).getDate();
+    const to = `${y}-${m}-${String(last).padStart(2, '0')}`;
+    return { from, to };
+  }
+  return {
+    from: document.getElementById('rfFrom').value,
+    to: document.getElementById('rfTo').value
+  };
+}
+
+function renderReport() {
+  const range = getReportRange();
+  const projId = document.getElementById('rfProject').value;
+  const wrap = document.getElementById('reportContent');
+
+  if (!range || !range.from || !range.to) {
+    wrap.innerHTML = '<div class="no-data">حدد الفترة الزمنية</div>';
+    return;
+  }
+
+  let txs = db.transactions.filter(t => t.date >= range.from && t.date <= range.to);
+  if (projId) txs = txs.filter(t => t.projectId === projId);
+
+  const totalIn = txs.filter(t => t.type === 'in').reduce((s, t) => s + t.amount, 0);
+  const totalOut = txs.filter(t => t.type === 'out').reduce((s, t) => s + t.amount, 0);
+  const balance = totalIn - totalOut;
+
+  // by category
+  const inByCat = {}, outByCat = {};
+  txs.filter(t => t.type === 'in').forEach(t => inByCat[t.category] = (inByCat[t.category] || 0) + t.amount);
+  txs.filter(t => t.type === 'out').forEach(t => outByCat[t.category] = (outByCat[t.category] || 0) + t.amount);
+
+  wrap.innerHTML = `
+    <div class="cards-row">
+      <div class="card green"><div class="card-label">إجمالي القبض</div><div class="card-value">${fmt(totalIn)}</div></div>
+      <div class="card red"><div class="card-label">إجمالي الصرف</div><div class="card-value">${fmt(totalOut)}</div></div>
+      <div class="card blue"><div class="card-label">الرصيد</div><div class="card-value">${fmt(balance)}</div></div>
+      <div class="card purple"><div class="card-label">عدد الحركات</div><div class="card-value">${txs.length}</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+      <div class="table-wrap" style="padding:16px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--green)">تفاصيل القبض</div>
+        ${Object.entries(inByCat).length ? Object.entries(inByCat).map(([k,v]) => `
+          <div class="summary-row"><span>${k}</span><span class="amount-in">${fmt(v)}</span></div>
+        `).join('') : '<div class="no-data">لا يوجد</div>'}
+        ${Object.entries(inByCat).length ? `<div class="summary-row"><span>الإجمالي</span><span class="amount-in">${fmt(totalIn)}</span></div>` : ''}
+      </div>
+      <div class="table-wrap" style="padding:16px">
+        <div style="font-size:14px;font-weight:700;margin-bottom:12px;color:var(--red)">تفاصيل الصرف</div>
+        ${Object.entries(outByCat).length ? Object.entries(outByCat).map(([k,v]) => `
+          <div class="summary-row"><span>${k}</span><span class="amount-out">${fmt(v)}</span></div>
+        `).join('') : '<div class="no-data">لا يوجد</div>'}
+        ${Object.entries(outByCat).length ? `<div class="summary-row"><span>الإجمالي</span><span class="amount-out">${fmt(totalOut)}</span></div>` : ''}
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-bottom:12px">تفاصيل الحركات</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>التاريخ</th>
+            <th>المشروع</th>
+            <th>النوع / التصنيف</th>
+            <th>الملاحظة</th>
+            <th>المبلغ</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${txs.length ? [...txs].sort((a,b) => b.date.localeCompare(a.date)).map(t => `
+            <tr>
+              <td>${t.date}</td>
+              <td>${getProjectName(t.projectId)}</td>
+              <td>
+                <span class="badge ${t.type==='in'?'badge-green':'badge-red'}">${t.type==='in'?'↑ قبض':'↓ صرف'}</span>
+                <span style="margin-right:6px;font-size:12px;color:var(--muted)">${t.category}</span>
+              </td>
+              <td style="color:var(--muted)">${t.note||'—'}</td>
+              <td class="${t.type==='in'?'amount-in':'amount-out'}">${fmt(t.amount)}</td>
+            </tr>
+          `).join('') : '<tr><td colspan="5" class="no-data">لا توجد حركات في هذه الفترة</td></tr>'}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ===================== EXPORT / IMPORT =====================
+function exportData() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'hesabat_' + today() + '.json';
+  a.click();
+}
+
+function importData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.projects && data.transactions) {
+        if (confirm('سيتم استبدال جميع البيانات الحالية. متأكد؟')) {
+          db = data;
+          saveDB();
+          refresh();
+          alert('تم الاستيراد بنجاح');
+        }
+      } else {
+        alert('الملف غير صحيح');
+      }
+    } catch(err) {
+      alert('خطأ في قراءة الملف');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ===================== REFRESH =====================
+function refresh() {
+  renderSidebar();
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'transactions') renderAllTx();
+  else if (currentPage === 'project') renderProjectPage();
+  else if (currentPage === 'reports') renderReport();
+}
+
+// ===================== INIT =====================
+renderSidebar();
+renderDashboard();
+</script>
+</body>
+</html>
